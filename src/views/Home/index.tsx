@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { API_BASE_URL } from "@/utils";
+
 const getBooksList = async () => {
   const res = await fetch(`${API_BASE_URL}/books`);
   if (!res.ok) {
