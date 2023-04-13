@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Register = () => {
+  const router = useRouter();
   const [form, setForm] = useState({
     clientName: "",
     clientEmail: "",
@@ -17,9 +19,8 @@ const Register = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/hello`, {
+      const response = await fetch(`/api/register`, {
         method: "POST",
-        mode: "no-cors",
         headers: {
           "Content-Type": "application/json",
         },
@@ -30,6 +31,35 @@ const Register = () => {
         throw new Error("Something went Wrong");
       }
       const result = await response.json();
+      localStorage.setItem("authToken", result.accessToken);
+      router.back();
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const handleSubmitOrder = async (e: any) => {
+    e.preventDefault();
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const response = await fetch(`/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          bookId: 1,
+          customerName: "John",
+        }),
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("Something went Wrong");
+      }
+      const result = await response.json();
+      console.log(result);
+      router.back();
     } catch (error) {
       alert(error);
     }
@@ -67,6 +97,8 @@ const Register = () => {
           Submit
         </button>
       </form>
+
+      <button onClick={handleSubmitOrder}>Submit Order</button>
     </div>
   );
 };
